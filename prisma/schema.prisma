@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model company_details {
+  company_id          Int      @id @default(autoincrement())
+  company_name        String?
+  company_description String?
+  website_url         String?
+  subreddit           String?
+  posts_per_week      Int?
+  calendar_posts      calendar_posts[]
+}
+
+model personas {
+  persona_username  String           @id
+  persona_description String?
+  calendar_posts    calendar_posts[]
+  calendar_comments calendar_comments[]
+}
+
+model chatgpt_queries {
+  keyword_id      String @id
+  keyword_phrase  String?
+  embedding_vector Unsupported("vector")
+  calendar_posts  calendar_posts[]
+}
+
+model calendar_posts {
+  post_id          String   @id
+  subreddit        String?
+  persona_username String?
+  title            String?
+  body             String?
+  timestamp        DateTime?
+  keyword_ids      Json?
+  personas         personas? @relation(fields: [persona_username], references: [persona_username])
+  calendar_comments calendar_comments[]
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model company_details {
+  company_id   String   @id @default(uuid()) @db.Uuid
+  company_name String?
+  description  String?
+  website_url  String?
+  posts_per_week Int?
+  inserted_at  DateTime @default(now())
+
+  subreddits   subreddits[]
+  calendar_posts calendar_posts[]
+}
+
+model subreddits {
+  subreddit_id   String @id @default(uuid()) @db.Uuid
+  company_id     String? @db.Uuid
+  subreddit_name String
+
+  company company_details? @relation(fields: [company_id], references: [company_id])
+  calendar_posts calendar_posts[]
+}
+
+model personas {
+  persona_id String @id @default(uuid()) @db.Uuid
+  persona_username String? @unique
+  persona_description String?
+
+  calendar_posts calendar_posts[]
+  calendar_comments calendar_comments[]
+}
+
+model keywords {
+  keyword_id String @id @default(uuid()) @db.Uuid
+  keyword_phrase String
+}
+
+model calendar_posts {
+  post_id String @id @default(uuid()) @db.Uuid
+  company_id String? @db.Uuid
+  subreddit_id String? @db.Uuid
+  persona_id String? @db.Uuid
+  title String?
+  body String?
+  timestamp DateTime?
+  keyword_ids String[]
+  created_at DateTime @default(now())
+
+  company company_details? @relation(fields: [company_id], references: [company_id])
+  subreddit subreddits? @relation(fields: [subreddit_id], references: [subreddit_id])
+  persona personas? @relation(fields: [persona_id], references: [persona_id])
+  comments calendar_comments[]
+}
+
+model calendar_comments {
+  comment_id String @id @default(uuid()) @db.Uuid
+  post_id String? @db.Uuid
+  parent_comment_id String? @db.Uuid
+  persona_id String? @db.Uuid
+  body String?
+  timestamp DateTime?
+  created_at DateTime @default(now())
+
+  post calendar_posts? @relation(fields: [post_id], references: [post_id])
+  persona personas? @relation(fields: [persona_id], references: [persona_id])
+  parent calendar_comments? @relation("CommentParent", fields: [parent_comment_id], references: [comment_id])
+  children calendar_comments[] @relation("CommentParent")
+}

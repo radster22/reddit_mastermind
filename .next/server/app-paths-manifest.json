@@ -1,0 +1,7 @@
+{
+  "/page": "app/page.js",
+  "/generating/page": "app/generating/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/calendar/route": "app/api/calendar/route.js",
+  "/api/generate-calendar/route": "app/api/generate-calendar/route.js"
+}
