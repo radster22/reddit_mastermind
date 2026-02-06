@@ -1,4 +1,4 @@
-# SlideForge Reddit Calendar System
+# Reddit Calendar System
 
 End-to-end demo that auto-generates a weekly Reddit content calendar using:
 - Next.js (App Router) + Tailwind for the UI and API orchestration
